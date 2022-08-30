@@ -1,10 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using FluentValidation;
 
 namespace IWantApp.Dtos.Category;
 
-public class CreateCategoryDto
+public record CreateCategoryDto(string Name)
 {
-    [Required]
-    [StringLength(100, MinimumLength = 2)]
-    public string Name { get; set; }
+    public class Validator : AbstractValidator<CreateCategoryDto>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Name)
+                .NotEmpty()
+                .NotNull()
+                .MaximumLength(100)
+                .MinimumLength(2);
+        }
+    }
 }

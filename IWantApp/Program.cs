@@ -1,3 +1,5 @@
+using FluentValidation;
+using IWantApp.Dtos.Category;
 using IWantApp.Endpoints.Categories;
 using IWantApp.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +32,9 @@ void ConfigureServices(WebApplicationBuilder builder)
 
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
+
+    builder.Services.AddValidatorsFromAssemblyContaining<CreateCategoryDto>(lifetime: ServiceLifetime.Scoped);
+    builder.Services.AddValidatorsFromAssemblyContaining<UpdateCategoryDto>(lifetime: ServiceLifetime.Scoped);
 }
 
 void ConfigureMethods(WebApplication app)
