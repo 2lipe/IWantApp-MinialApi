@@ -18,5 +18,21 @@ public class ProductMap : IEntityTypeConfiguration<Product>
         builder.Property(x => x.Description)
             .IsRequired()
             .HasMaxLength(255);
+
+        builder.Property(x => x.CreatedAt)
+            .IsRequired()
+            .HasColumnType("DATETIME")
+            .HasDefaultValue(DateTime.Now.ToUniversalTime());
+
+        builder.Property(x => x.UpdatedAt)
+            .IsRequired(false)
+            .HasColumnType("DATETIME")
+            .HasDefaultValue(DateTime.Now.ToUniversalTime());
+
+        builder.Property(x => x.CreatedBy)
+            .IsRequired();
+
+        builder.Property(x => x.UpdatedBy)
+            .IsRequired(false);
     }
 }
