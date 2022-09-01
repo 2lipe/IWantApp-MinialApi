@@ -3,7 +3,6 @@ using IWantApp.Domain.Products;
 using IWantApp.Dtos.Category;
 using IWantApp.Extensions;
 using IWantApp.ViewModels;
-using Microsoft.AspNetCore.Mvc;
 using ApplicationContext = IWantApp.Infrastructure.Data.ApplicationContext;
 
 namespace IWantApp.Endpoints.Categories;

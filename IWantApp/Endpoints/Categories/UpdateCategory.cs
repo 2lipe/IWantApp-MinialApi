@@ -11,7 +11,7 @@ namespace IWantApp.Endpoints.Categories;
 
 public class UpdateCategory
 {
-    public static string Template => "v1/categories/{id}";
+    public static string Template => "v1/categories/{id:guid}";
     public static string[] Methods => new[] { HttpMethod.Put.ToString() };
     public static Delegate Handle => Action;
 

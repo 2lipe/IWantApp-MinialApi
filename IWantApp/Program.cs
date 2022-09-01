@@ -1,8 +1,10 @@
 using FluentValidation;
 using IWantApp.Dtos.Category;
+using IWantApp.Dtos.Employee;
 using IWantApp.Endpoints.Categories;
+using IWantApp.Endpoints.Employees;
 using IWantApp.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,16 +27,21 @@ app.Run();
 void ConfigureServices(WebApplicationBuilder builder)
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    builder.Services.AddDbContext<ApplicationContext>(options =>
-    {
-        options.UseSqlServer(connectionString);
-    });
+    builder.Services.AddSqlServer<ApplicationContext>(connectionString);
+    builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+        {
+            options.User.RequireUniqueEmail = true;
+            options.Password.RequireUppercase = false;
+        })
+        .AddEntityFrameworkStores<ApplicationContext>();
 
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
 
     builder.Services.AddValidatorsFromAssemblyContaining<CreateCategoryDto>(lifetime: ServiceLifetime.Scoped);
     builder.Services.AddValidatorsFromAssemblyContaining<UpdateCategoryDto>(lifetime: ServiceLifetime.Scoped);
+
+    builder.Services.AddValidatorsFromAssemblyContaining<CreateEmployeeDto>(lifetime: ServiceLifetime.Scoped);
 }
 
 void ConfigureMethods(WebApplication app)
@@ -44,5 +51,11 @@ void ConfigureMethods(WebApplication app)
     app.MapMethods(GetCategories.Template, GetCategories.Methods, GetCategories.Handle);
     app.MapMethods(UpdateCategory.Template, UpdateCategory.Methods, UpdateCategory.Handle);
     app.MapMethods(GetCategoryById.Template, GetCategoryById.Methods, GetCategoryById.Handle);
+    #endregion
+
+    #region Employee
+    app.MapMethods(CreateEmployee.Template, CreateEmployee.Methods, CreateEmployee.Handle);
+    app.MapMethods(GetEmployees.Template, GetEmployees.Methods, GetEmployees.Handle);
+
     #endregion
 }
