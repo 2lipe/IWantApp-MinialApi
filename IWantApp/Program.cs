@@ -4,10 +4,14 @@ using IWantApp.Dtos.Employee;
 using IWantApp.Endpoints.Categories;
 using IWantApp.Endpoints.Employees;
 using IWantApp.Infrastructure.Data;
+using IWantApp.Infrastructure.Repositories;
+using IWantApp.Infrastructure.Repositories.CategoryRepository;
+using IWantApp.Infrastructure.Repositories.EmployeeRepository;
 using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
+ConfigureRepositories(builder);
 ConfigureServices(builder);
 
 var app = builder.Build();
@@ -42,6 +46,13 @@ void ConfigureServices(WebApplicationBuilder builder)
     builder.Services.AddValidatorsFromAssemblyContaining<UpdateCategoryDto>(lifetime: ServiceLifetime.Scoped);
 
     builder.Services.AddValidatorsFromAssemblyContaining<CreateEmployeeDto>(lifetime: ServiceLifetime.Scoped);
+}
+
+void ConfigureRepositories(WebApplicationBuilder builder)
+{
+    builder.Services.AddTransient(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+    builder.Services.AddTransient<IIdentityRepository, IdentityRepository>();
+    builder.Services.AddTransient<ICategoryRepository, CategoryRepository>();
 }
 
 void ConfigureMethods(WebApplication app)

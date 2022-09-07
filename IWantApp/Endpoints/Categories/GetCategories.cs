@@ -1,7 +1,6 @@
-﻿using IWantApp.ViewModels;
+﻿using IWantApp.Infrastructure.Repositories.CategoryRepository;
+using IWantApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ApplicationContext = IWantApp.Infrastructure.Data.ApplicationContext;
 
 namespace IWantApp.Endpoints.Categories;
 
@@ -11,24 +10,14 @@ public class GetCategories
     public static string[] Methods => new[] { HttpMethod.Get.ToString() };
     public static Delegate Handle => Action;
 
-    public static async Task<IResult> Action(ApplicationContext context, [FromQuery] int page = 0, [FromQuery] int pageSize = 25)
+    public static async Task<IResult> Action(ICategoryRepository categoryRepository, [FromQuery] int page = 0, [FromQuery] int pageSize = 25)
     {
         if (pageSize > 1000)
             pageSize = 1000;
 
-        var categories = await context.Categories
-            .AsNoTracking()
-            .Select(x => new GetCategoryViewModel
-            {
-                Id = x.Id,
-                Name = x.Name,
-                HasActive = x.HasActive
-            })
-            .Skip(page * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
+        var categories = await categoryRepository.GetAllAsync(page, pageSize);
 
-        var total = await context.Categories.CountAsync();
+        var total = await categoryRepository.CountAsync();
 
         var result = new
         {

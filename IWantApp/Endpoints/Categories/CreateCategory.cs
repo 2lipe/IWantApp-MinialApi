@@ -2,8 +2,8 @@
 using IWantApp.Domain.Products;
 using IWantApp.Dtos.Category;
 using IWantApp.Extensions;
+using IWantApp.Infrastructure.Repositories.CategoryRepository;
 using IWantApp.ViewModels;
-using ApplicationContext = IWantApp.Infrastructure.Data.ApplicationContext;
 
 namespace IWantApp.Endpoints.Categories;
 
@@ -13,21 +13,20 @@ public class CreateCategory
     public static string[] Methods => new[] { HttpMethod.Post.ToString() };
     public static Delegate Handle => Action;
 
-    public static async Task<IResult> Action(IValidator<CreateCategoryDto> validator, CreateCategoryDto data, ApplicationContext context)
+    public static async Task<IResult> Action(IValidator<CreateCategoryDto> validator, CreateCategoryDto data, ICategoryRepository categoryRepository)
     {
         var validationResult = await validator.ValidateAsync(data);
 
         if (!validationResult.IsValid)
             return Results.BadRequest(new ResultViewModel<string>(validationResult.GetErrors()));
 
-        var category = new Category()
+        var category = new Category
         {
             Name = data.Name,
             CreatedBy = Guid.NewGuid()
         };
 
-        await context.Categories.AddAsync(category);
-        await context.SaveChangesAsync();
+        await categoryRepository.AddAsync(category);
 
         return Results.Created($"v1/categories/{category.Id}", new ResultViewModel<Category>(category));
     }

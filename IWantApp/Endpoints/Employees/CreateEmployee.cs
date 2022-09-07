@@ -2,6 +2,7 @@
 using FluentValidation;
 using IWantApp.Dtos.Employee;
 using IWantApp.Extensions;
+using IWantApp.Infrastructure.Repositories.EmployeeRepository;
 using IWantApp.Utils;
 using IWantApp.ViewModels;
 using Microsoft.AspNetCore.Identity;
@@ -14,7 +15,7 @@ public class CreateEmployee
     public static string[] Methods => new[] { HttpMethod.Post.ToString() };
     public static Delegate Handle => Action;
 
-    public static async Task<IResult> Action(IValidator<CreateEmployeeDto> validator, CreateEmployeeDto data, UserManager<IdentityUser> userManager)
+    public static async Task<IResult> Action(IValidator<CreateEmployeeDto> validator, CreateEmployeeDto data, IIdentityRepository identityRepository)
     {
         var validationResult = await validator.ValidateAsync(data);
 
@@ -27,7 +28,7 @@ public class CreateEmployee
             Email = data.Email,
         };
 
-        var result = await userManager.CreateAsync(user, data.Password);
+        var result = await identityRepository.AddEmployeeAsync(user, data.Password);
 
         if (!result.Succeeded)
             return Results.BadRequest(new ResultViewModel<string>(result.GetIdentityErrors()));
@@ -38,7 +39,7 @@ public class CreateEmployee
             new("Name", data.Name)
         };
 
-        var claimResult = await userManager.AddClaimsAsync(user, userClaims);
+        var claimResult = await identityRepository.AddClaimsAsync(user, userClaims);
 
         if (!claimResult.Succeeded)
             return Results.BadRequest(new ResultViewModel<string>(claimResult.GetIdentityErrors()));

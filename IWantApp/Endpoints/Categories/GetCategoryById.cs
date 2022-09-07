@@ -1,7 +1,7 @@
-﻿using IWantApp.Infrastructure.Data;
+﻿using IWantApp.Domain.Products;
+using IWantApp.Infrastructure.Repositories.CategoryRepository;
 using IWantApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace IWantApp.Endpoints.Categories;
 
@@ -11,22 +11,13 @@ public class GetCategoryById
     public static string[] Methods => new[] { HttpMethod.Get.ToString() };
     public static Delegate Handle => Action;
 
-    public static async Task<IResult> Action(ApplicationContext context, [FromRoute] Guid id)
+    public static async Task<IResult> Action(ICategoryRepository categoryRepository, [FromRoute] Guid id)
     {
-        var result = await context.Categories
-            .AsNoTracking()
-            .Where(x => x.Id == id)
-            .Select(x => new GetCategoryViewModel
-            {
-                Id = x.Id,
-                Name = x.Name,
-                HasActive = x.HasActive
-            })
-            .FirstOrDefaultAsync();
+        var result = await categoryRepository.GetByIdAsync(id);
 
         if (result == null)
             return Results.NotFound(new ResultViewModel<string>("Category has not found"));
 
-        return Results.Ok(new ResultViewModel<GetCategoryViewModel>(result));
+        return Results.Ok(new ResultViewModel<Category>(result));
     }
 }
