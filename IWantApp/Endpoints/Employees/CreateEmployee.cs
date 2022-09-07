@@ -4,12 +4,11 @@ using IWantApp.Dtos.Employee;
 using IWantApp.Extensions;
 using IWantApp.Infrastructure.Repositories.EmployeeRepository;
 using IWantApp.Utils;
-using IWantApp.ViewModels;
 using Microsoft.AspNetCore.Identity;
 
 namespace IWantApp.Endpoints.Employees;
 
-public class CreateEmployee
+public class CreateEmployee : ApiBase
 {
     public static string Template => "v1/employees";
     public static string[] Methods => new[] { HttpMethod.Post.ToString() };
@@ -20,7 +19,7 @@ public class CreateEmployee
         var validationResult = await validator.ValidateAsync(data);
 
         if (!validationResult.IsValid)
-            return Results.BadRequest(new ResultViewModel<string>(validationResult.GetErrors()));
+            return ResultError(validationResult.GetErrors());
 
         var user = new IdentityUser
         {
@@ -31,7 +30,7 @@ public class CreateEmployee
         var result = await identityRepository.AddEmployeeAsync(user, data.Password);
 
         if (!result.Succeeded)
-            return Results.BadRequest(new ResultViewModel<string>(result.GetIdentityErrors()));
+            return ResultError(result.GetIdentityErrors());
 
         var userClaims = new List<Claim>
         {
@@ -42,8 +41,8 @@ public class CreateEmployee
         var claimResult = await identityRepository.AddClaimsAsync(user, userClaims);
 
         if (!claimResult.Succeeded)
-            return Results.BadRequest(new ResultViewModel<string>(claimResult.GetIdentityErrors()));
+            return ResultError(claimResult.GetIdentityErrors());
 
-        return Results.Created($"/employees/{user.Id}", new ResultViewModel<IdentityUser>(user));
+        return CreatedOk($"/employees/{user.Id}", user);
     }
 }

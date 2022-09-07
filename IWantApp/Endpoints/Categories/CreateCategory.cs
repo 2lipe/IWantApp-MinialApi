@@ -3,11 +3,10 @@ using IWantApp.Domain.Products;
 using IWantApp.Dtos.Category;
 using IWantApp.Extensions;
 using IWantApp.Infrastructure.Repositories.CategoryRepository;
-using IWantApp.ViewModels;
 
 namespace IWantApp.Endpoints.Categories;
 
-public class CreateCategory
+public class CreateCategory : ApiBase
 {
     public static string Template => "v1/categories";
     public static string[] Methods => new[] { HttpMethod.Post.ToString() };
@@ -18,7 +17,7 @@ public class CreateCategory
         var validationResult = await validator.ValidateAsync(data);
 
         if (!validationResult.IsValid)
-            return Results.BadRequest(new ResultViewModel<string>(validationResult.GetErrors()));
+            return ResultError(validationResult.GetErrors());
 
         var category = new Category
         {
@@ -28,6 +27,6 @@ public class CreateCategory
 
         await categoryRepository.AddAsync(category);
 
-        return Results.Created($"v1/categories/{category.Id}", new ResultViewModel<Category>(category));
+        return CreatedOk($"v1/categories/{category.Id}", category);
     }
 }

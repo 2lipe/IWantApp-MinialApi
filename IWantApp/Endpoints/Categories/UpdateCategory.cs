@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace IWantApp.Endpoints.Categories;
 
-public class UpdateCategory
+public class UpdateCategory : ApiBase
 {
     public static string Template => "v1/categories/{id:guid}";
     public static string[] Methods => new[] { HttpMethod.Put.ToString() };
@@ -19,7 +19,7 @@ public class UpdateCategory
         var validationResult = await validator.ValidateAsync(data);
 
         if (!validationResult.IsValid)
-            return Results.BadRequest(new ResultViewModel<string>(validationResult.GetErrors()));
+            return ResultError(validationResult.GetErrors());
 
         var result = await categoryRepository.GetByIdAsync(id);
 
@@ -33,6 +33,6 @@ public class UpdateCategory
 
         await categoryRepository.UpdateAsync(result);
 
-        return Results.Ok(new ResultViewModel<string>("Update with success", null));
+        return ResultOk("Update with success");
     }
 }

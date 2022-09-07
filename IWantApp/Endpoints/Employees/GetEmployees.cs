@@ -1,10 +1,8 @@
 ﻿using IWantApp.Infrastructure.Repositories.EmployeeRepository;
-using IWantApp.ViewModels;
-using Microsoft.AspNetCore.Identity;
 
 namespace IWantApp.Endpoints.Employees;
 
-public class GetEmployees
+public class GetEmployees : ApiBase
 {
     public static string Template => "v1/employees";
     public static string[] Methods => new[] { HttpMethod.Get.ToString() };
@@ -17,6 +15,6 @@ public class GetEmployees
 
         var result = await identityRepository.GetAllEmployeesWithClaimsAsync(page, pageSize);
 
-        return Results.Ok(new ResultViewModel<IEnumerable<IdentityUser>>(result));
+        return ResultOk(result);
     }
 }
